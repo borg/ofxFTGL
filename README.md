@@ -17,7 +17,11 @@ Oriol mod to add support for paragraph
 https://github.com/armadillu/ofxFTGL
 
 Borg mods 2013/08/19:
+
 -FTGL had origin in bottom left corner. Now flipped to top left. 
+
 -Bounding box origin top left.
+
 -Paragraph support for alignment.
+
 -getTextHeight support for paragraph
