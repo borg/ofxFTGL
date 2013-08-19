@@ -13,3 +13,11 @@ I recompiled the FTGL static lib on osx (libftgl_max2048.a) with a moded version
 Find the modded FTGL in https://github.com/armadillu/ftgl_2048
 
 
+Oriol mod to add support for paragraph
+https://github.com/armadillu/ofxFTGL
+
+Borg mods 2013/08/19:
+-FTGL had origin in bottom left corner. Now flipped to top left. 
+-Bounding box origin top left.
+-Paragraph support for alignment.
+-getTextHeight support for paragraph
