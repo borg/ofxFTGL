@@ -26,11 +26,12 @@ public:
 	ofRectangle getStringBoundingBox(wstring s, float x, float y);
 	ofRectangle getStringBoundingBox(string s, float x, float y);
     
-	ofRectangle getParagraphBoundingBox(string s, float x, float y, float boxWidth, float lineHeight, FTGL::TextAlignment align);
-	ofRectangle getParagraphBoundingBox(wstring s, float x, float y, float boxWidth, float lineHeight, FTGL::TextAlignment align);
+    //if no width passed will use default
+	ofRectangle getParagraphBoundingBox(string s, float x, float y, float boxWidth = -1, float lineHeight = 1.0f, FTGL::TextAlignment align = FTGL::ALIGN_LEFT);
+	ofRectangle getParagraphBoundingBox(wstring s, float x, float y, float boxWidth = -1, float lineHeight = 1.0f, FTGL::TextAlignment align = FTGL::ALIGN_LEFT);
 	
     
-    float getTextHeight(string s, float boxWidth, float lineHeight, FTGL::TextAlignment align);
+    float getTextHeight(string s, float boxWidth, float lineHeight = 1.0f, FTGL::TextAlignment align = FTGL::ALIGN_LEFT);
     
 	void		drawString(wstring s, float x, float y);
 	void		drawString(string s, float x, float y);
@@ -40,7 +41,7 @@ public:
 	FTFont * font;
 	FTSimpleLayout layout;
 	
-	void drawParagraph(string text, float x, float y, float boxWidth = -1.0, float lineHeight = -1.0f, FTGL::TextAlignment align = FTGL::ALIGN_LEFT);
+	void drawParagraph(string text, float x, float y, float boxWidth = -1, float lineHeight = 1.0f, FTGL::TextAlignment align = FTGL::ALIGN_LEFT);
 	
 protected:
     
