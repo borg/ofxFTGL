@@ -87,8 +87,21 @@ void ofxFTGLFont::setTextAlignment(FTGL::TextAlignment ta){
 
 ofRectangle ofxFTGLFont::getStringBoundingBox(string s, float x, float y){
 	if(loaded){
+        
+        //compensate for y flip
+        float firstLineH=0;
+        if(s.size()>0){
+            string firstLetter = s.substr(0,1);
+            FTBBox bbox = layout.BBox(firstLetter.c_str());
+            firstLineH = bbox.Upper().Yf();
+        }
+
+        
+        
 		FTBBox bbox = font->BBox(s.c_str());
-		return ofRectangle(x + bbox.Lower().Xf(), y + bbox.Lower().Yf(), bbox.Upper().Xf(), bbox.Upper().Yf());
+		//return ofRectangle(x + bbox.Lower().Xf(), y + bbox.Lower().Yf(), bbox.Upper().Xf(), bbox.Upper().Yf());
+        
+        return ofRectangle(x + bbox.Lower().Xf(), y + bbox.Upper().Yf()-firstLineH, bbox.Upper().Xf(), -bbox.Lower().Yf()+firstLineH);
 	}
 	return ofRectangle();
 }
@@ -107,35 +120,89 @@ ofRectangle ofxFTGLFont::getParagraphBoundingBox(string s, float x, float y, flo
 		if (boxWidth > 0) layout.SetLineLength(boxWidth);
 		if (align > 0) layout.SetAlignment(align);
 		if (lineHeight_ > 0) layout.SetLineSpacing(lineHeight_);
-
+        
+        
+        
+        //compensate for y flip
+        float firstLineH=0;
+        if(s.size()>0){
+            string firstLetter = s.substr(0,1);
+            FTBBox bbox = layout.BBox(firstLetter.c_str());
+            firstLineH = bbox.Upper().Yf();
+        }
+        
 		FTBBox bbox = layout.BBox(s.c_str());
+        
 
 		//restore
 		if (boxWidth > 0) layout.SetLineLength(paragraphWidth);
 		if (align > 0) layout.SetAlignment((FTGL::TextAlignment)textAlignment);
 		if (lineHeight_ > 0) layout.SetLineSpacing(lineHeight);
-
-		return ofRectangle(x + bbox.Lower().Xf(), y + bbox.Lower().Yf(), bbox.Upper().Xf(), bbox.Upper().Yf());
+        
+        //these are flipped around. Natively FTGL sets origin at bottom left of first line.
+        //not useful for paragraphs
+		return ofRectangle(x + bbox.Lower().Xf(), y + bbox.Upper().Yf()-firstLineH, bbox.Upper().Xf(), -bbox.Lower().Yf()+firstLineH);
 	}
 	return ofRectangle();
 }
 
 
-void ofxFTGLFont::drawParagraph(string paragraph_, float x, float y, float boxWidth, float lineHeight_, FTGL::TextAlignment align){
+float ofxFTGLFont::getTextHeight(string s, float boxWidth, float lineHeight_, FTGL::TextAlignment align){
+    if(loaded){
+		//set temporarly
+		if (boxWidth > 0) layout.SetLineLength(boxWidth);
+		if (align > 0) layout.SetAlignment(align);
+		if (lineHeight_ > 0) layout.SetLineSpacing(lineHeight_);
+        
+        
+        
+        //compensate for y flip
+        float firstLineH=0;
+        if(s.size()>0){
+            string firstLetter = s.substr(0,1);
+            FTBBox bbox = layout.BBox(firstLetter.c_str());
+            firstLineH = bbox.Upper().Yf();
+        }
+        
+		FTBBox bbox = layout.BBox(s.c_str());
+        
+        
+		//restore
+		if (boxWidth > 0) layout.SetLineLength(paragraphWidth);
+		if (align > 0) layout.SetAlignment((FTGL::TextAlignment)textAlignment);
+		if (lineHeight_ > 0) layout.SetLineSpacing(lineHeight);
+        
+        //these are flipped around. Natively FTGL sets origin at bottom left of first line.
+        //not useful for paragraphs
+		return  -bbox.Lower().Yf()+firstLineH;
+	}
+	return 0;
 
+};
+
+void ofxFTGLFont::drawParagraph(string paragraph_, float x, float y, float boxWidth, float lineHeight_, FTGL::TextAlignment align){
+    
 	if(loaded){
 		//set temporarly
 		if (boxWidth > 0) layout.SetLineLength(boxWidth);
 		if (align > 0) layout.SetAlignment(align);
 		if (lineHeight_ > 0) layout.SetLineSpacing(lineHeight_);
 		
+        //compensate for y flip
+        float firstLineH=0;
+        if(paragraph_.size()>0){
+            string firstLetter = paragraph_.substr(0,1);        
+            FTBBox bbox = layout.BBox(firstLetter.c_str());
+            firstLineH = bbox.Upper().Yf();
+        }
+        
 		glPushMatrix();
-		glTranslatef(x, y, 0);
+		glTranslatef(x, y+firstLineH, 0);
 		ofLine(0, 0, boxWidth, 0);
 		glScalef(1, -1, 1);
 		layout.Render(paragraph_.c_str());
 		glPopMatrix();
-
+        
 		//restore
 		if (boxWidth > 0) layout.SetLineLength(paragraphWidth);
 		if (align > 0) layout.SetAlignment((FTGL::TextAlignment)textAlignment);
@@ -146,8 +213,21 @@ void ofxFTGLFont::drawParagraph(string paragraph_, float x, float y, float boxWi
 
 void ofxFTGLFont::drawString(string s, float x, float y){
 	if(loaded){
+        
+        
+        //compensate for y flip
+        float firstLineH=0;
+        if(s.size()>0){
+            string firstLetter = s.substr(0,1);
+            FTBBox bbox = layout.BBox(firstLetter.c_str());
+            firstLineH = bbox.Upper().Yf();
+        }
+
+        
+        
+        
 		glPushMatrix();
-		glTranslatef(x, y, 0);
+		glTranslatef(x, y+firstLineH, 0);
 		glScalef(1, -1, 1);
 		
 		font->Render(s.c_str());
