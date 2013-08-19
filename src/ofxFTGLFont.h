@@ -19,9 +19,15 @@ public:
 	bool		isLoaded();
 	
 	void		setSize(int size);
-	
+	void		setLineHeight(float);
+	void		setParagraphWidth(float);
+	void		setTextAlignment(FTGL::TextAlignment);
+
 	ofRectangle getStringBoundingBox(wstring s, float x, float y);
 	ofRectangle getStringBoundingBox(string s, float x, float y);
+
+	ofRectangle getParagraphBoundingBox(string s, float x, float y, float boxWidth, float lineHeight, FTGL::TextAlignment align);
+	ofRectangle getParagraphBoundingBox(wstring s, float x, float y, float boxWidth, float lineHeight, FTGL::TextAlignment align);
 	
 	void		drawString(wstring s, float x, float y);
 	void		drawString(string s, float x, float y);
@@ -31,9 +37,13 @@ public:
 	FTFont * font;
 	FTSimpleLayout layout;
 	
-	void drawParagraph(string text, float x, float y, float boxWidth, float lineHeight = 1.0f, FTGL::TextAlignment align = FTGL::ALIGN_LEFT);
+	void drawParagraph(string text, float x, float y, float boxWidth = -1.0, float lineHeight = -1.0f, FTGL::TextAlignment align = FTGL::ALIGN_LEFT);
 	
 protected:
-	bool loaded;
+
+	float	lineHeight;
+	float	paragraphWidth;
+	int		textAlignment; //FTGL::TextAlignment
+	bool	loaded;
 };
 

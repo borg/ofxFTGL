@@ -1,6 +1,9 @@
 #include "ofxFTGLFont.h"
 
 ofxFTGLFont::ofxFTGLFont(){
+	lineHeight = 1.0;
+	paragraphWidth = 300;
+	textAlignment = FTGL::ALIGN_LEFT;
 	loaded = false;
 	font = NULL;
 }
@@ -62,6 +65,25 @@ void ofxFTGLFont::setSize(int size){
 	}
 }
 
+void ofxFTGLFont::setLineHeight(float lh){
+	lineHeight = lh;
+	if(loaded){
+		layout.SetLineSpacing(lh);
+	}
+}
+void ofxFTGLFont::setParagraphWidth(float w){
+	paragraphWidth = w;
+	if(loaded){
+		layout.SetLineLength(w);
+	}
+}
+void ofxFTGLFont::setTextAlignment(FTGL::TextAlignment ta){
+	textAlignment = ta;
+	if(loaded){
+		layout.SetAlignment(ta);
+	}
+}
+
 
 ofRectangle ofxFTGLFont::getStringBoundingBox(string s, float x, float y){
 	if(loaded){
@@ -71,7 +93,6 @@ ofRectangle ofxFTGLFont::getStringBoundingBox(string s, float x, float y){
 	return ofRectangle();
 }
 
-
 ofRectangle ofxFTGLFont::getStringBoundingBox(wstring s, float x, float y){
 	if(loaded){
 		FTBBox bbox = font->BBox((wchar_t *)s.c_str());
@@ -80,38 +101,69 @@ ofRectangle ofxFTGLFont::getStringBoundingBox(wstring s, float x, float y){
 	return ofRectangle();
 }
 
+ofRectangle ofxFTGLFont::getParagraphBoundingBox(string s, float x, float y, float boxWidth, float lineHeight_, FTGL::TextAlignment align){
+	if(loaded){
+		//set temporarly
+		if (boxWidth > 0) layout.SetLineLength(boxWidth);
+		if (align > 0) layout.SetAlignment(align);
+		if (lineHeight_ > 0) layout.SetLineSpacing(lineHeight_);
 
-void ofxFTGLFont::drawParagraph(string paragraph_, float x, float y, float boxWidth, float lineHeight, FTGL::TextAlignment align){
-	
-	layout.SetLineLength(boxWidth);
-	layout.SetAlignment(align);
-	layout.SetLineSpacing(lineHeight);
-	
-	glPushMatrix();
-	glTranslatef(x, y, 0);
-	ofLine(0, 0, boxWidth, 0);
-	glScalef(1, -1, 1);
-	layout.Render(paragraph_.c_str());
-	glPopMatrix();
+		FTBBox bbox = layout.BBox(s.c_str());
+
+		//restore
+		if (boxWidth > 0) layout.SetLineLength(paragraphWidth);
+		if (align > 0) layout.SetAlignment((FTGL::TextAlignment)textAlignment);
+		if (lineHeight_ > 0) layout.SetLineSpacing(lineHeight);
+
+		return ofRectangle(x + bbox.Lower().Xf(), y + bbox.Lower().Yf(), bbox.Upper().Xf(), bbox.Upper().Yf());
+	}
+	return ofRectangle();
+}
+
+
+void ofxFTGLFont::drawParagraph(string paragraph_, float x, float y, float boxWidth, float lineHeight_, FTGL::TextAlignment align){
+
+	if(loaded){
+		//set temporarly
+		if (boxWidth > 0) layout.SetLineLength(boxWidth);
+		if (align > 0) layout.SetAlignment(align);
+		if (lineHeight_ > 0) layout.SetLineSpacing(lineHeight_);
+		
+		glPushMatrix();
+		glTranslatef(x, y, 0);
+		ofLine(0, 0, boxWidth, 0);
+		glScalef(1, -1, 1);
+		layout.Render(paragraph_.c_str());
+		glPopMatrix();
+
+		//restore
+		if (boxWidth > 0) layout.SetLineLength(paragraphWidth);
+		if (align > 0) layout.SetAlignment((FTGL::TextAlignment)textAlignment);
+		if (lineHeight_ > 0) layout.SetLineSpacing(lineHeight);
+	}
 }
 
 
 void ofxFTGLFont::drawString(string s, float x, float y){
-	glPushMatrix();
-	glTranslatef(x, y, 0);
-	glScalef(1, -1, 1);
-	
-	font->Render(s.c_str());
-	glPopMatrix();
+	if(loaded){
+		glPushMatrix();
+		glTranslatef(x, y, 0);
+		glScalef(1, -1, 1);
+		
+		font->Render(s.c_str());
+		glPopMatrix();
+	}
 }
 
 
 void ofxFTGLFont::drawString(wstring s, float x, float y){
-	glPushMatrix();
-	glTranslatef(x, y, 0);
-	glScalef(1, -1, 1);
-	font->Render((wchar_t *)s.c_str());
-	glPopMatrix();
+	if(loaded){
+		glPushMatrix();
+		glTranslatef(x, y, 0);
+		glScalef(1, -1, 1);
+		font->Render((wchar_t *)s.c_str());
+		glPopMatrix();
+	}
 }
 
 
