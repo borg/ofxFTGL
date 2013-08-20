@@ -198,7 +198,6 @@ void ofxFTGLFont::drawParagraph(string paragraph_, float x, float y, float boxWi
         
 		glPushMatrix();
 		glTranslatef(x, y+firstLineH, 0);
-		ofLine(0, 0, boxWidth, 0);
 		glScalef(1, -1, 1);
 		layout.Render(paragraph_.c_str());
 		glPopMatrix();
